@@ -14,15 +14,22 @@
         "default_title": "Blocklist Sharer",
         "default_popup": "popup/popup.html"
     },
-    "permissions": [],
+    "permissions": [
+    ],
     "host_permissions": [
-        "*://*.fetlife.com/*"
+        "*://fetlife.com/*"
     ],
     "background": {
         "service_worker": "service-worker.js"
     },
-    "content_scripts": [{
-        "js": ["foreground.js"],
-        "matches": ["https://github.com/*"]
-    }]
+    "content_scripts": [
+        {
+            "js": [
+                "fetlife.js"
+            ],
+            "matches": [
+                "https://fetlife.com/settings/blocked*"
+            ]
+        }
+    ]
 }
