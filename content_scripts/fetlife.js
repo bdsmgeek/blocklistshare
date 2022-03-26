@@ -18,11 +18,58 @@ function addFetlifeExportButton() {
     blockExportButton.addEventListener("click", () => { setStartExport() })
 }
 
+function addFetlifeImportButton() {
+    //https://www.html5rocks.com/en/tutorials/file/dndfiles//
+    var blockedHeader = document.querySelector('h3.mv0.fw4.f5.lh-copy.gray-300')
+
+    var import_container = document.createElement("div")
+
+    var import_label = document.createElement("label")
+
+    import_label.textContent = "Import: "
+
+    import_container.appendChild(import_label)
+
+    var blockImportButton = document.createElement("input")
+
+    blockImportButton.type = "file"
+    blockImportButton.name = "files[]"
+    blockImportButton.id = "files"
+
+    import_container.appendChild(blockImportButton)
+
+    blockedHeader.appendChild(import_container)
+
+    blockImportButton.addEventListener("change", (event) => {
+        const fileList = event.target.files;
+        window.localStorage.setItem("__import_list__", "[]")
+        var reader = new FileReader();
+        reader.onload = function() {
+            let arrayOfBlocks = JSON.parse(reader.result)
+            let importList = JSON.parse(window.localStorage.getItem("__import_list__"))
+            importList = importList.concat(arrayOfBlocks);
+            window.localStorage.setItem("__import_list__", JSON.stringify(importList))
+        }
+
+        for (let i = 0; i < fileList.length; i++) {
+            let file = fileList.item(i);
+            reader.readAsText(file);
+        }
+    })
+}
+
 function setStartExport() {
     console.log("start export set")
-    //chrome.runtime.sendMessage("export_fetlife" (response))
+        //chrome.runtime.sendMessage("export_fetlife" (response))
     window.localStorage.setItem('__export_fetlife__', "true")
     setStartFetlifeExport()
+}
+
+function setStartImport() {
+    console.log("start export set")
+        //chrome.runtime.sendMessage("export_fetlife" (response))
+    window.localStorage.setItem('__import_fetlife__', "true")
+    setStartFetlifeImport()
 }
 
 function setStartFetlifeExport() {
@@ -33,20 +80,18 @@ function setStartFetlifeExport() {
 
     list = list.concat([...document.querySelectorAll('a.relative.overflow-hidden.dib.link')]
         .map(
-            r => (
-                {
-                    link: r.href,
-                    username: r.title
-                }
-            )
+            r => ({
+                link: r.href,
+                username: r.title
+            })
         )
     )
 
     console.log('blocklist length: ' + list.length)
-    // save results in local storage
+        // save results in local storage
     window.localStorage.setItem('__blocked__', JSON.stringify(list))
-    // programmatically click the "next page" button
-    // to fetch more blocked users 
+        // programmatically click the "next page" button
+        // to fetch more blocked users 
     let next = document.querySelector('.next_page')
 
     if (next.className.search("disabled") > 0) {
@@ -63,14 +108,19 @@ function setStartFetlifeExport() {
             link.click(); // This will download the data file named "my_data.csv"
         }
         window.localStorage.removeItem("__blocked__")
-        
+
     } else {
         next.click()
     }
 }
 
-if (window.localStorage.__export_fetlife__){
+function setStartFetlifeImport() {
+    window.location.href = '...';
+}
+
+if (window.localStorage.__export_fetlife__) {
     setStartFetlifeExport()
 } else {
     addFetlifeExportButton()
+    addFetlifeImportButton()
 }
